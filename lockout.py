@@ -79,7 +79,7 @@ class LockoutExpAnalyzer():
 		print(f"Number of data points: {len(results)}")
 
 
-	def analyze_stock(self, row, print_shit=False):
+	def analyze_stock(self, row):
 		"""
 		Inputs:
 			row: Ticker,Exp,Initial
@@ -98,7 +98,7 @@ class LockoutExpAnalyzer():
 
 		# Determine start and end points analysis interval.
 		start_dt = lockout_exp_dt - datetime.timedelta(days=self.days_before)
-		end_dt = lockout_exp_dt + datetime.timedelta(days=2)
+		end_dt = lockout_exp_dt + datetime.timedelta(days=5)
 		
 		# Format date to yfinance format: yyyy-mm-dd.
 		lockout_exp_yf = format_dt_for_yf(lockout_exp_dt)
@@ -129,7 +129,7 @@ class LockoutExpAnalyzer():
 		period_post_exp_price_delta = post_exp_price_close - pre_exp_period_start_price
 		period_post_exp_price_delta_pcnt = 100 * period_post_exp_price_delta / pre_exp_period_start_price
 		
-		if print_shit:
+		if self.print_shit:
 			print(f"=============================================")
 			print(f"Ticker: {ticker}")
 			print(f"Day After Exp")
