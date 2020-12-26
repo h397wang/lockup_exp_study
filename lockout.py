@@ -1,14 +1,16 @@
 """
 Make money off of lockup expiry dates.
 
-A lockup period prevents insiders from trading for some time after IPO.
-When this lockup expires, a massive amount of shares become available.
+A lockup period restricts insiders from trading for some time after IPO.
+When this lockup expires, a significant amount of shares become available.
+This varies case by case of course.
+
 If the company is one of those super hype, sexy, overpriced tech companies
-with low float. It's likely that it makes stupid runups and has a huge PE
-after IPO. Insiders will naturally seek to sell their stocks at such outrageous
+with low float. It's likely that it makes stupid runups post IPO and has a huge PE.
+Insiders will naturally seek to sell their stocks at such outrageous
 prices. The anticipation of this sell off causes the stock price to drop
-well in advance, a few weeks. There may or may not be a strong price drop
-on the day after expiration.
+well in advance, typically a week. There may or may not be a strong price drop
+on the day after expiration because it depends on insides creating that sell pressure.
 
 We do a backtest anslysis of what happens when you take a short position
 some X days bfore the lockup expiration date, and exit the day after.
@@ -19,7 +21,10 @@ Example Usage:
 Play around with the days-before value to optimize entry position.
 
 The data strongly supports the thesis, when we consider unicorn companies like
-the ones listed in meme_lockouts.csv.
+the ones listed in meme_lockouts.csv. These companies are what I deem as sexy,
+overpriced with huge hype. I also see them mentioned a lot of wsb. This list
+does not show any bias because I did not know what kind of historical behavior 
+a particular stock had during their lockup exp period.
 """
 
 import argparse
