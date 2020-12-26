@@ -1,32 +1,3 @@
-"""
-Make money off of lockup expiry dates.
-
-A lockup period restricts insiders from trading for some time after IPO.
-When this lockup expires, a significant amount of shares become available.
-This varies case by case of course.
-
-If the company is one of those super hype, sexy, overpriced tech companies
-with low float. It's likely that it makes stupid runups post IPO and has a huge PE.
-Insiders will naturally seek to sell their stocks at such outrageous
-prices. The anticipation of this sell off causes the stock price to drop
-well in advance, typically a week. There may or may not be a strong price drop
-on the day after expiration because it depends on insides creating that sell pressure.
-
-We do a backtest anslysis of what happens when you take a short position
-some X days bfore the lockup expiration date, and exit the day after.
-
-Example Usage:
-	python3 lockout.py meme_lockouts.csv --days-before 7
-
-Play around with the days-before value to optimize entry position.
-
-The data strongly supports the thesis, when we consider unicorn companies like
-the ones listed in meme_lockouts.csv. These companies are what I deem as sexy,
-overpriced with huge hype. I also see them mentioned a lot of wsb. This list
-does not show any bias because I did not know what kind of historical behavior 
-a particular stock had during their lockup exp period.
-"""
-
 import argparse
 import csv
 from collections import namedtuple
@@ -46,6 +17,7 @@ AnalysisResults = namedtuple(
 # I don't think it really matter what we use.
 # We could use some mid point between LOW and HIGH
 DAILY_POINT = "Close"
+DROP_PCNT_THRESHOLD = -5
 
 
 def format_dt_for_dfq(dt):
@@ -75,20 +47,30 @@ class LockoutExpAnalyzer():
 
 		# Remove outliers when reporting average.
 		deltas = sorted([r.period_delta_pcnt for r in self.results])
-		cutoff = int(lesn(deltas) / 10)s
-		deltas = deltas[cutoff:-cutoff]
-		assert(len(deltas) < len(self.results))
-		period_delta_pcnt_avg = stats.mean(deltas)
+		cutoff = int(len(deltas) / 10)
+		deltas_cutoff = deltas[cutoff:-cutoff]
+		assert(len(deltas_cutoff) < len(self.results))
+		period_delta_pcnt_avg = stats.mean(deltas_cutoff)
+		outliers_removed = len(self.results) - len(deltas_cutoff)
 
 		drop_happens = map(lambda r: 1 if r.period_delta_pcnt < 0 else 0, self.results)
 		correctness = stats.mean(drop_happens)
 
-		print(f"=========================")
-		print(f"Aggregate Summary")
+		significant_drop_happens = map(
+			lambda r: 1 if r.period_delta_pcnt < DROP_PCNT_THRESHOLD else 0,
+			self.results
+		)
+		significant_correctness = stats.mean(significant_drop_happens)
+
+		print(f"=======================================================")
+		print(f"Report Summary")
 		print(f"Average Period Delta: {period_delta_pcnt_avg:.1f}%")
-		print(f"How often are we correct about the drop: {100 * correctness:.1f}%")
+		print(f"Drop Correctness: {100*correctness:.1f}%")
+		print(f"Significant Drop Correctness ({DROP_PCNT_THRESHOLD}%): {100*significant_correctness:.1f}%")
 		print(f"Number of data points: {len(self.results)}")
-	
+		print(f"Number of outliers removed: {outliers_removed}")
+
+
 	def show_graph(self):
 		for r in self.results:			
 			plt.plot(r.signal_norm)
