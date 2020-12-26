@@ -62,9 +62,10 @@ def normalize_signal(col):
 
 
 class LockoutExpAnalyzer():
-	def __init__(self, stocks_df, days_before, print_shit=False):
+	def __init__(self, stocks_df, days_before, days_after=1, print_shit=False):
 		self.stocks_df = stocks_df
 		self.days_before = days_before
+		self.days_after = days_after
 		self.print_shit = print_shit
 
 		results = []
@@ -103,7 +104,7 @@ class LockoutExpAnalyzer():
 
 		# Determine start and end points analysis interval.
 		start_dt = lockout_exp_dt - datetime.timedelta(days=self.days_before)
-		end_dt = lockout_exp_dt + datetime.timedelta(days=5)
+		end_dt = lockout_exp_dt + datetime.timedelta(days=3 + self.days_after)
 		
 		# Format date to yfinance format: yyyy-mm-dd.
 		lockout_exp_yf = format_dt_for_yf(lockout_exp_dt)
@@ -117,6 +118,7 @@ class LockoutExpAnalyzer():
 		# Format datetime objects for DF query.
 		lockout_exp_dfq = format_dt_for_dfq(lockout_exp_dt)
 		start_period_dfq = format_dt_for_dfq(start_dt)
+		days_after_dfq = format_dt_for_dfq(lockout_exp_dt + datetime.timedelta(days=self.days_after))
 
 		# Calculate the mean, and range in the period 1 week pre exp.
 		pre_exp_df = data.query(f"Date <= {lockout_exp_dfq}")
@@ -124,7 +126,7 @@ class LockoutExpAnalyzer():
 		pre_exp_lowest = pre_exp_df["Low"].min()
 		pre_exp_mean = pre_exp_df["Close"].mean()
 
-		post_exp_df = data.query(f"Date > {lockout_exp_dfq}").iloc[0]
+		post_exp_df = data.query(f"Date <= {days_after_dfq}").iloc[-1]
 		post_exp_price_close = post_exp_df["Close"]
 		post_exp_price_high = post_exp_df["High"]
 		post_exp_price_low = post_exp_df["Low"]
@@ -166,6 +168,12 @@ def main():
 		help="Number of (non trading) days before exp date."
 	)
 	parser.add_argument(
+		"--days-after",
+		type=int,
+		default=1,
+		help="Number of (non trading) days after exp date. Must be > 1."
+	)
+	parser.add_argument(
 		"--print-shit",
 		dest="print_shit",
 		action="store_true",
@@ -174,7 +182,12 @@ def main():
 	args = parser.parse_args()
 	stocks_df = pd.read_csv(args.csv_file)
 	
-	LockoutExpAnalyzer(stocks_df, args.days_before, args.print_shit)
+	LockoutExpAnalyzer(
+		stocks_df,
+		args.days_before,
+		args.days_after,
+		args.print_shit
+	)
 
 
 if __name__ == "__main__":
