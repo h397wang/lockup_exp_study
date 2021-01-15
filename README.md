@@ -26,4 +26,6 @@ a particular stock had during their lockup exp period.
 Example Usage:
 	python3 lockout.py meme_lockouts.csv --days-before 7 --show-graph --print-shit
 
-The results show an average drop of -11%, with a correct drop prediction over 80% of the time. 
+The results show an average drop of -11%, with a correct drop prediction over 80% of the time.
+
+![alt text](https://github.com/h397wang/lockup_exp_study/blob/masterb/meme_lockups.png?raw=true)
