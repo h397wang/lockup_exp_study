@@ -28,4 +28,4 @@ Example Usage:
 
 The results show an average drop of -11%, with a correct drop prediction over 80% of the time.
 
-![alt text](https://github.com/h397wang/lockup_exp_study/blob/masterb/meme_lockups.png?raw=true)
+![alt text](https://github.com/h397wang/lockup_exp_study/blob/main/meme_lockups.png?raw=true)
